@@ -31,7 +31,7 @@ class GymStatisticsFile(DataFile):
         if self.file_path is None:
             raise ValueError('Please give a valid file path')
 
-        with open(self.file_path, newline='') as device_file:
+        with open(self.file_path) as device_file:
             self._usage_stats = pandas.read_csv(device_file, sep=',')
 
         return self._usage_stats

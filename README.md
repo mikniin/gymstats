@@ -6,7 +6,11 @@ Initially, we started reading everything as just csv, this didn't get us very fa
 Changed into depending upon pandas, which offers aggregations, grouping and some basic
 data analysis tools out of the box.
 
-For unit tests, opted for pytest
+For unit tests, opted for unittest
+
+Unittests are included also in the main exercise, running the data integrity tests.
+
+You can run them separately as well, in src dir, run python3 -m unittest org/gymstats/tests/TestDataIntegrity.py
 
 Architecture, started doing structure as a basic script, which evolved more into domain
 driven design like structure. This can be converted into a format, where we'd be able to

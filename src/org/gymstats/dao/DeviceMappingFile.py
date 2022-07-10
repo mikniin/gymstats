@@ -34,7 +34,7 @@ class DeviceMappingFile(DataFile):
         if self.file_path is None:
             raise ValueError('Please give a valid file path')
 
-        with open(self.file_path, newline='') as device_file:
+        with open(self.file_path) as device_file:
             reader = csv.DictReader(device_file)
             for row in reader:
                 self._mappings[row['beacon']] = row['device name']
