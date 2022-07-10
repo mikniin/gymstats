@@ -1,4 +1,4 @@
-import csv
+import pandas
 
 from org.gymstats.dao.DataFile import DataFile
 
@@ -13,14 +13,14 @@ class GymStatisticsFile(DataFile):
         """Init and """
         DataFile.__init__(self, file_name)
         # time: {beacon1: count, beacon2: count, beacon3: count}
-        self._usage_stats = {}
+        self._usage_stats = None
 
     @property
-    def usage_stats(self) -> dict:
+    def usage_stats(self) -> pandas.DataFrame:
         """Get the usage stats in memory"""
         return self._usage_stats
 
-    def read_data(self) -> dict:
+    def read_data(self) -> pandas.DataFrame:
         """Read the contents of the gym usage stats file
 
         Read the data from gym usage stats file, expecting the contents to be small
@@ -32,8 +32,6 @@ class GymStatisticsFile(DataFile):
             raise ValueError('Please give a valid file path')
 
         with open(self.file_path, newline='') as device_file:
-            reader = csv.DictReader(device_file)
-            for row in reader:
-                self._usage_stats[row['time']] = {key:row[key] for key in row if key != 'time'}
+            self._usage_stats = pandas.read_csv(device_file, sep=',')
 
         return self._usage_stats
