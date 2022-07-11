@@ -44,6 +44,9 @@ class WeatherImpact:
         self._stats = self._stats.reset_index()
 
     def temperature_impact(self):
+        print(self._weather.shape)
+        print(self._stats.shape)
+        print(self._merged.shape)
         print(self._merged)
         pass
 
