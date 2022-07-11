@@ -1,4 +1,3 @@
-from sqlite3 import DatabaseError
 import pandas
 
 
