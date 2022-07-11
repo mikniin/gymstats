@@ -23,6 +23,7 @@ class TestDataIntegrity(unittest.TestCase):
             reader = csv.DictReader(gymdata)
             for _ in reader:
                 count += 1
+        self.assertGreater(self.datafile.usage_stats.size, 50000)
         self.assertTrue(count > 50000)
 
     def test_records_between(self):
@@ -34,7 +35,7 @@ class TestDataIntegrity(unittest.TestCase):
 
     def test_all_columns_positive(self):
         """Test that all numerical columns are positive"""
-        stats = pandas.DataFrame(self.datafile.usage_stats)
+        stats = self.datafile.usage_stats.copy()
         for column in stats:
             if column == 'time':
                 continue

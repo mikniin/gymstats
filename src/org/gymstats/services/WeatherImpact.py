@@ -55,6 +55,23 @@ class WeatherImpact:
         temp_key = 'Temperature (degC)'
         rain_key = 'Precipitation (mm)'
 
+        temps = self._merged.copy()
+        temps = temps[['Total', temp_key]] \
+            .groupby(pandas.Grouper(temp_key)) \
+                .agg({'Total': ['sum', 'count', 'mean']})
+        temps = temps.reset_index()
+        correlation = temps[['Total', temp_key]].corr(method='pearson')[temp_key][:]
+        print(correlation['Total'])
+
+        if correlation['Total']['sum'] > 0:
+            print('Temperature should have a positive correlation to gym popularity:',
+                correlation['Total']['sum'])
+        elif correlation['Total']['sum'] < 0:
+            print('Temperature should have a negative correlation to gym popularity:',
+                correlation['Total']['sum'])
+        else:
+            print('Temperature has no correlation to gym popularity')
+
         stats = self._merged.copy()
         stats = stats[['Total', temp_key, rain_key]] \
             .groupby(pandas.cut(stats[temp_key], 15, precision=0)) \
@@ -71,4 +88,17 @@ class WeatherImpact:
         print(stats.tail(5))
 
     def precipitation_impact(self):
-        pass
+        """Check if precipitation impacts the gym use
+
+        Check it precipitation has any impact
+        Check if snow thickness has any impact on the use
+        """
+        rain_key = 'Precipitation (mm)'
+        snow_key = 'Snow depth (cm)'
+
+        stats = self._merged.copy()
+        '''
+        stats = stats[['Total', rain_key, snow_key]] \
+            .groupby(pandas.Grouper(key=rain_key)) \
+                .agg({})
+        '''
