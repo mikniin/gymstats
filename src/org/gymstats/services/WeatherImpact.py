@@ -1,3 +1,4 @@
+from os import stat
 import pandas
 
 from org.gymstats.domain.GymUsageStats import GymUsageStats
@@ -24,6 +25,9 @@ class WeatherImpact:
         self.group_stats_hourly()
         # merge our data, inner method... so only common rows are present
         self._merged = pandas.merge(self._stats, self._weather, on=['Year', 'Month', 'Day', 'Hour', 'Timezone'])
+        print('Weather data shape:', self._weather.shape)
+        print('Gym stats usage shape:', self._stats.shape)
+        print('Merged data shape', self._merged.shape)
 
     def format_weather(self):
         """Format weather hours to match stats hours"""
@@ -44,11 +48,27 @@ class WeatherImpact:
         self._stats = self._stats.reset_index()
 
     def temperature_impact(self):
-        print(self._weather.shape)
-        print(self._stats.shape)
-        print(self._merged.shape)
-        print(self._merged)
-        pass
+        """Analyze if temperature somehow affects usage minutes
+
+        Group and aggregate by temperature, dig out mean of temperature and highest and lowest use
+        """
+        temp_key = 'Temperature (degC)'
+        rain_key = 'Precipitation (mm)'
+
+        stats = self._merged.copy()
+        stats = stats[['Total', temp_key, rain_key]] \
+            .groupby(pandas.cut(stats[temp_key], 15, precision=0)) \
+                .agg({'Total': ['sum', 'count', 'mean']})
+
+        print('Stats; temperature by total use')
+        stats = stats.sort_values(by=[('Total', 'sum')], ascending=False)
+        print(stats.head(5))
+        print(stats.tail(5))
+
+        print('Stats; use by highest and lowest temperature')
+        stats = stats.sort_values(by=temp_key, ascending=False)
+        print(stats.head(5))
+        print(stats.tail(5))
 
     def precipitation_impact(self):
         pass
