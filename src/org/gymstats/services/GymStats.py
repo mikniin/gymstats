@@ -3,8 +3,11 @@ import unittest
 
 from org.gymstats.dao.DeviceMappingFile import DeviceMappingFile
 from org.gymstats.dao.GymStatisticsFile import GymStatisticsFile
+from org.gymstats.dao.WeatherFile import WeatherFile
+from org.gymstats.domain.GymUsageStats import GymUsageStats
 from org.gymstats.services.HourlyStats import HourlyStats
 from org.gymstats.services.PopularityStats import PopularityStats
+from org.gymstats.services.WeatherImpact import WeatherImpact
 from org.gymstats.tests.TestDataIntegrity import TestDataIntegrity
 
 
@@ -16,6 +19,7 @@ class GymStats:
     def __init__(self) -> None:
         self._device_mappings = DeviceMappingFile('device-mapping.csv')
         self._gym_statistics = GymStatisticsFile('hietaniemi-gym-data.csv')
+        self._weather_stats = WeatherFile('kaisaniemi-weather-data.csv')
 
     def read_data(self):
         """Read in the required data for the exercises
@@ -26,6 +30,7 @@ class GymStats:
         try:
             self._device_mappings.read_data()
             self._gym_statistics.read_data()
+            self._weather_stats.read_data()
         except:
             logging.error('Failed to read data from files')
             raise
@@ -69,6 +74,31 @@ class GymStats:
         popularity_service.weekend_popularity()
         print('=== GymStats - Popularity stats exercise over')
 
+    def run_enrich_data(self):
+        """Enrich the gym data with certain elements
+
+        Create a domain object out of the gym statistics and enrich it certain data
+        """
+        print('=== Enrich data exercise')
+        print(GymUsageStats(self._gym_statistics.usage_stats).dataframe)
+        print('=== Enrich data exercise over')
+
+    def run_weather_impact(self):
+        """Analyze weather impact on use of gym
+
+        Does the temperature impact the gym popularity
+        Does precipitation impact the gym popularity
+        """
+        print('=== GymStats - Analyzing weather impact')
+        weather_impact = WeatherImpact(
+            self._device_mappings.mappings,
+            self._gym_statistics.usage_stats,
+            self._weather_stats.weather_data
+        )
+        weather_impact.temperature_impact()
+        weather_impact.precipitation_impact()
+        print('=== GymStats - Weather impact analyzis complete')
+
     def run(self):
         """Run all the exercises"""
         self.read_data()
@@ -76,3 +106,5 @@ class GymStats:
         self.aggregate_hourly_stats()
         self.run_data_integrity_tests()
         self.run_popularity_analysis()
+        self.run_enrich_data()
+        self.run_weather_impact()

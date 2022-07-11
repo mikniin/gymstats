@@ -23,11 +23,13 @@ class GymStatisticsFile(DataFile):
 
         Read the data from gym usage stats file, expecting the contents to be small
         and file to be set
+
+        FIXME: Could be on base class
         """
         if self.file_path is None:
             raise ValueError('Please give a valid file path')
 
-        with open(self.file_path) as device_file:
-            self._usage_stats = pandas.read_csv(device_file, sep=',', parse_dates=True)
+        with open(self.file_path) as stats_file:
+            self._usage_stats = pandas.read_csv(stats_file, sep=',', parse_dates=True)
 
         return self._usage_stats
