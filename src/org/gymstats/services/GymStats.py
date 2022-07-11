@@ -4,6 +4,7 @@ import unittest
 from org.gymstats.dao.DeviceMappingFile import DeviceMappingFile
 from org.gymstats.dao.GymStatisticsFile import GymStatisticsFile
 from org.gymstats.services.HourlyStats import HourlyStats
+from org.gymstats.services.PopularityStats import PopularityStats
 from org.gymstats.tests.TestDataIntegrity import TestDataIntegrity
 
 
@@ -16,7 +17,7 @@ class GymStats:
         self._device_mappings = DeviceMappingFile('device-mapping.csv')
         self._gym_statistics = GymStatisticsFile('hietaniemi-gym-data.csv')
 
-    def _read_data(self):
+    def read_data(self):
         """Read in the required data for the exercises
 
         Read all the required files into the memory (bad idea, should make them streamable)"""
@@ -29,7 +30,7 @@ class GymStats:
             logging.error('Failed to read data from files')
             raise
 
-    def _aggregate_hourly_stats(self):
+    def aggregate_hourly_stats(self):
         """Run hourly stats out of the gym data
 
         Run aggregations using Hourly stats class and present 10 first rows of the aggregation
@@ -38,10 +39,9 @@ class GymStats:
         print('=== GymStats - Running hourly aggregation exercise')
         stats_service = HourlyStats(self._device_mappings.mappings, self._gym_statistics.usage_stats)
         stats_service.aggregate()
-        stats_service.present_data()
         print('=== GymStats - Hourly aggregation exercise over')
 
-    def _run_data_integrity_tests(self):
+    def run_data_integrity_tests(self):
         """Run data integrity tests
 
         Runs tests using an included test class
@@ -55,9 +55,24 @@ class GymStats:
         runner.run(suite)
         print('=== GymStats - Data integrity test exercise over')
 
+    def run_popularity_analysis(self):
+        """Analyse the popularity of the gym
+
+        Determine which device was the most popular device based on used minutes (value 2 is 0-2mins though)
+        Check if time of day has an impact to the popularity of the gym
+        Check if gym is more popular during weekends than not
+        """
+        print('=== GymStats - Running popularity stats exercise')
+        popularity_service = PopularityStats(self._device_mappings.mappings, self._gym_statistics.usage_stats)
+        popularity_service.popular_device()
+        popularity_service.popular_time()
+        popularity_service.weekend_popularity()
+        print('=== GymStats - Popularity stats exercise over')
+
     def run(self):
         """Run all the exercises"""
-        self._read_data()
+        self.read_data()
 
-        self._aggregate_hourly_stats()
-        self._run_data_integrity_tests()
+        self.aggregate_hourly_stats()
+        self.run_data_integrity_tests()
+        self.run_popularity_analysis()
